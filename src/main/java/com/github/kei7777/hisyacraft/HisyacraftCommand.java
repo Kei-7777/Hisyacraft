@@ -43,38 +43,6 @@ public class HisyacraftCommand implements CommandExecutor, TabCompleter {
             String msg = Hisyacraft.mode ? "有効" : "無効";
             sender.sendMessage("Neoモードを" + msg + "にしました。");
             return true;
-        } else if ("test".equalsIgnoreCase(args[0])) {
-            Player p = (Player) sender;
-            Arrow ent = p.getWorld().spawn(p.getLocation().add(0, 0.45, 0), Arrow.class);
-            ent.setGravity(false);
-            ent.setPassenger(p);
-            new BukkitRunnable(){
-                int c = 0;
-                @Override
-                public void run() {
-                    Location to = ent.getLocation();
-                    c++;
-                    if(to.clone().add(0,-1,0).getBlock().getType() == Material.AIR){
-                        ent.setGravity(false);
-                        ent.setVelocity(new Vector(1,-1,0));
-                    } else {
-                        ent.setGravity(true);
-                        ent.setVelocity(new Vector(1,0,0));
-                    }
-
-                    if(ent.getLocation().clone().add(1, 0, 0).getBlock().getType() != Material.AIR){
-                        ent.remove();
-                        this.cancel();
-                    }
-
-                    if(c > 100){
-                        ent.remove();
-                        this.cancel();
-                    }
-
-                }
-            }.runTaskTimer(plugin, 0, 1);
-            return true;
         } else {
             sender.sendMessage("/hisya toggle 有効/無効切り替え。\n/hisya mode 通常/Neo切り替え。");
             return true;
