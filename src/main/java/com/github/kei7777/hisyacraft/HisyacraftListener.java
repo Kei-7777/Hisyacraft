@@ -9,15 +9,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class HisyacraftListener implements Listener {
     static Plugin plugin;
+
     public HisyacraftListener(Hisyacraft hisyacraft) {
         this.plugin = hisyacraft;
     }
@@ -25,18 +22,161 @@ public class HisyacraftListener implements Listener {
     int max = 100;
     HashMap<Player, Arrow> arrows = new HashMap<Player, Arrow>();
     List<Material> airblocks = Arrays.asList(
-        Material.AIR,
-        Material.WATER,
-        Material.GRASS,
-        Material.TALL_GRASS
+            Material.AIR,
+            Material.WATER,
+            Material.GRASS,
+            Material.TALL_GRASS
     );
 
+    Map<Player, List<Location>> fakeblocks = new HashMap<>();
+
     @EventHandler
-    public void onBreak(BlockBreakEvent e){
+    public void onBreak(BlockBreakEvent e) {
         e.getPlayer().sendMessage(e.getBlock().getType().toString());
     }
 
     @EventHandler
+    public void onMoveb(PlayerMoveEvent e) {
+        if (!Hisyacraft.enable) return;
+        if (!Hisyacraft.mode) { // neo
+            Player p = e.getPlayer();
+            Location from = e.getFrom();
+            Location to = e.getTo();
+
+            //p.sendMessage(Yaw.getYaw(p).toString());
+
+            Yaw yaw = Yaw.getYaw(p);
+
+            if (!fakeblocks.containsKey(p)) {
+                fakeblocks.put(p, new ArrayList<>());
+            }
+
+            if (yaw == Yaw.WEST || yaw == Yaw.EAST) { // Z-1 Z+1
+                List<Location> copy = fakeblocks.get(p);
+                List<Location> locs = new ArrayList<>();
+                Location loc = new Location(p.getWorld(), p.getEyeLocation().getBlockX(), p.getEyeLocation().getBlockY(), p.getEyeLocation().getBlockZ());
+
+                locs.add(loc.clone().add(0, 0, 1));
+                locs.add(loc.clone().add(0, -1, 1));
+                locs.add(loc.clone().add(0, -2, 1));
+                locs.add(loc.clone().add(0, 1, 1));
+                locs.add(loc.clone().add(-1, 0, 1));
+                locs.add(loc.clone().add(-1, -1, 1));
+                locs.add(loc.clone().add(-1, -2, 1));
+                locs.add(loc.clone().add(-1, 1, 1));
+                locs.add(loc.clone().add(1, 0, 1));
+                locs.add(loc.clone().add(1, -1, 1));
+                locs.add(loc.clone().add(1, -2, 1));
+                locs.add(loc.clone().add(1, 1, 1));
+                locs.add(loc.clone().add(0, 0, -1));
+                locs.add(loc.clone().add(0, -1, -1));
+                locs.add(loc.clone().add(0, -2, -1));
+                locs.add(loc.clone().add(0, 1, -1));
+                locs.add(loc.clone().add(-1, 0, -1));
+                locs.add(loc.clone().add(-1, -1, -1));
+                locs.add(loc.clone().add(-1, -2, -1));
+                locs.add(loc.clone().add(-1, 1, -1));
+                locs.add(loc.clone().add(1, 0, -1));
+                locs.add(loc.clone().add(1, -1, -1));
+                locs.add(loc.clone().add(1, -2, -1));
+                locs.add(loc.clone().add(1, 1, -1));
+                locs.add(loc.clone().add(0, 0, 2));
+                locs.add(loc.clone().add(0, -1, 2));
+                locs.add(loc.clone().add(0, -2, 2));
+                locs.add(loc.clone().add(0, 1, 2));
+                locs.add(loc.clone().add(-1, 0, 2));
+                locs.add(loc.clone().add(-1, -1, 2));
+                locs.add(loc.clone().add(-1, -2, 2));
+                locs.add(loc.clone().add(-1, 1, 2));
+                locs.add(loc.clone().add(1, 0, 2));
+                locs.add(loc.clone().add(1, -1, 2));
+                locs.add(loc.clone().add(1, -2, 2));
+                locs.add(loc.clone().add(1, 1, 2));
+                locs.add(loc.clone().add(0, 0, -2));
+                locs.add(loc.clone().add(0, -1, -2));
+                locs.add(loc.clone().add(0, -2, -2));
+                locs.add(loc.clone().add(0, 1, -2));
+                locs.add(loc.clone().add(-1, 0, -2));
+                locs.add(loc.clone().add(-1, -1, -2));
+                locs.add(loc.clone().add(-1, -2, -2));
+                locs.add(loc.clone().add(-1, 1, -2));
+                locs.add(loc.clone().add(1, 0, -2));
+                locs.add(loc.clone().add(1, -1, -2));
+                locs.add(loc.clone().add(1, -2, -2));
+                locs.add(loc.clone().add(1, 1, -2));
+
+                for (Location l : copy) {
+                    if (!locs.contains(l)) {
+                        p.sendBlockChange(l, l.getBlock().getType().createBlockData());
+                    }
+                }
+                for (Location c : locs) {
+                    if (c.getBlock().getType() == Material.AIR)
+                        p.sendBlockChange(c, Material.BARRIER.createBlockData());
+                }
+
+                copy.clear();
+                copy.addAll(locs);
+            } else if (yaw == Yaw.SOUTH || yaw == Yaw.NORTH) { // X-1 X+1
+                List<Location> copy = fakeblocks.get(p);
+                List<Location> locs = new ArrayList<>();
+                Location loc = new Location(p.getWorld(), p.getEyeLocation().getBlockX(), p.getEyeLocation().getBlockY(), p.getEyeLocation().getBlockZ());
+
+                locs.add(loc.clone().add(1, 0, 0));
+                locs.add(loc.clone().add(1, 1, 0));
+                locs.add(loc.clone().add(1, -1, 0));
+                locs.add(loc.clone().add(1, 0, 1));
+                locs.add(loc.clone().add(1, 1, 1));
+                locs.add(loc.clone().add(1, -1, 1));
+                locs.add(loc.clone().add(1, 0, -1));
+                locs.add(loc.clone().add(1, 1, -1));
+                locs.add(loc.clone().add(1, -1, -1));
+                locs.add(loc.clone().add(-1, 0, 0));
+                locs.add(loc.clone().add(-1, 1, 0));
+                locs.add(loc.clone().add(-1, -1, 0));
+                locs.add(loc.clone().add(-1, 0, 1));
+                locs.add(loc.clone().add(-1, 1, 1));
+                locs.add(loc.clone().add(-1, -1, 1));
+                locs.add(loc.clone().add(-1, 0, -1));
+                locs.add(loc.clone().add(-1, 1, -1));
+                locs.add(loc.clone().add(-1, -1, -1));
+                locs.add(loc.clone().add(2, 0, 0));
+                locs.add(loc.clone().add(2, 1, 0));
+                locs.add(loc.clone().add(2, -1, 0));
+                locs.add(loc.clone().add(2, 0, 1));
+                locs.add(loc.clone().add(2, 1, 1));
+                locs.add(loc.clone().add(2, -1, 1));
+                locs.add(loc.clone().add(2, 0, -1));
+                locs.add(loc.clone().add(2, 1, -1));
+                locs.add(loc.clone().add(2, -1, -1));
+                locs.add(loc.clone().add(-2, 0, 0));
+                locs.add(loc.clone().add(-2, 1, 0));
+                locs.add(loc.clone().add(-2, -1, 0));
+                locs.add(loc.clone().add(-2, 0, 1));
+                locs.add(loc.clone().add(-2, 1, 1));
+                locs.add(loc.clone().add(-2, -1, 1));
+                locs.add(loc.clone().add(-2, 0, -1));
+                locs.add(loc.clone().add(-2, 1, -1));
+                locs.add(loc.clone().add(-2, -1, -1));
+
+
+                for (Location l : copy) {
+                    if (!locs.contains(l)) {
+                        p.sendBlockChange(l, l.getBlock().getType().createBlockData());
+                    }
+                }
+                for (Location c : locs) {
+                    if (c.getBlock().getType() == Material.AIR)
+                        p.sendBlockChange(c, Material.BARRIER.createBlockData());
+                }
+                copy.clear();
+                copy.addAll(locs);
+            }
+        }
+
+    }
+
+    /*@EventHandler
     public void onMove(PlayerMoveEvent e){
         if(!Hisyacraft.enable) return;
         if(Hisyacraft.mode){ // neo
@@ -349,5 +489,5 @@ public class HisyacraftListener implements Listener {
                 }
             }
         }
-    }
+    }*/
 }
